@@ -1,14 +1,24 @@
+import db from "#db/client";
+
 /** @returns the employee created according to the provided details */
 export async function createEmployee({ name, birthday, salary }) {
-  const sql = `
-    INSERT INTO employees (name, birthday, salary)
-    VALUES ($1, $2, $3)
-    RETURNING *
-  `;
-  const {
-    rows: [employee],
-  } = await db.query(sql, [name, birthday, salary]);
-  return employee;
+  try {
+    const {
+      rows: [newlyCreatedEmployee],
+    } = await db.query(
+      `
+      INSERT INTO employees (name, birthday, salary)
+      VALUES ($1, $2, $3)
+      RETURNING *;
+    `,
+      [name, birthday, salary],
+    );
+
+    console.log(`NEWLY CREATED EMPLOYEE:`, newlyCreatedEmployee);
+    return newlyCreatedEmployee;
+  } catch (err) {
+    console.log(`ERROR CREATING A EMPLOYEE:`, err);
+  }
 }
 
 // === Part 2 ===
@@ -19,6 +29,7 @@ export async function getEmployees() {
   SELECT *
   FROM employees
   `;
+  // destructuring object, but NOT the array. This is giving rows an alias of movies
   const { rows: employees } = await db.query(sql);
   return employees;
 }
@@ -33,6 +44,7 @@ export async function getEmployee(id) {
   FROM employees
   WHERE id = $1
   `;
+  // destructuring object, but NOT the array. This is giving rows an alias of movies
   const {
     rows: [employee],
   } = await db.query(sql, [id]);
@@ -45,9 +57,8 @@ export async function getEmployee(id) {
  */
 export async function updateEmployee({ id, name, birthday, salary }) {
   const sql = `
-  UPDATE employees
-  SET
-    name = $2,
+    UPDATE employees
+    SET name = $2,
     birthday = $3,
     salary = $4
   WHERE id = $1

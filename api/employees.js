@@ -3,7 +3,7 @@ const router = express.Router();
 export default router;
 
 import {
-  createEmpoyee,
+  createEmployee,
   getEmployee,
   getEmployees,
   deleteEmployee,
